@@ -7,7 +7,9 @@ public enum SuccessResult {
 
     CREATED_SUCCESS(200,"Created data successfully"),
     UPDATE_SUCCESS(200,"Updated data successfully"),
-    DELETE_SUCCESS(200,"Delete data successfully");
+    DELETE_SUCCESS(200,"Delete data successfully"),
+    EXPORT_SUCCESS(200,"Export data successfully"),
+    IMPORT_SUCCESS(200,"Import data successfully");
     private final int status;
     private final String message;
 

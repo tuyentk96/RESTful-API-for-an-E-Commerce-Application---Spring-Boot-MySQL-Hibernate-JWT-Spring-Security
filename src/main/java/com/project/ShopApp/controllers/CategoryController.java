@@ -29,9 +29,7 @@ public class CategoryController {
         if (result.hasErrors()){
            return ValidatedErrorResponse.validatedErrorResponse(result);
         }
-
         return ResponseEntity.ok(categoryService.createCategory(categoryRequest));
-
     }
 
     @GetMapping("")

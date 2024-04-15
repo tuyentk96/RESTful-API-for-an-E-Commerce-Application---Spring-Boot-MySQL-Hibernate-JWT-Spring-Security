@@ -106,6 +106,9 @@ public class WebSecurityConfig {
                                     HttpMethod.GET,String.format("%s/shopping-cart/**",apiPrefix)
                             )
                             .hasAnyRole("ADMIN","USER")
+                            .requestMatchers(
+                                    HttpMethod.POST,String.format("%s/import-data/**",apiPrefix)
+                            ).hasRole("ADMIN")
                             .anyRequest().authenticated();
                 })
                 .csrf(AbstractHttpConfigurer::disable);
