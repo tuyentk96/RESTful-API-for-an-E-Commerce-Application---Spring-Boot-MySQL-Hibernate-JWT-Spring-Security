@@ -109,6 +109,9 @@ public class WebSecurityConfig {
                             .requestMatchers(
                                     HttpMethod.POST,String.format("%s/import-data/**",apiPrefix)
                             ).hasRole("ADMIN")
+                            .requestMatchers(
+                                    HttpMethod.POST,String.format("%s/export-data/**",apiPrefix)
+                            ).hasRole("ADMIN")
                             .anyRequest().authenticated();
                 })
                 .csrf(AbstractHttpConfigurer::disable);
