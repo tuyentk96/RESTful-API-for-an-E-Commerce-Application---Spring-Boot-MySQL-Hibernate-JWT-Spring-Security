@@ -67,12 +67,37 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private boolean isBypassToken(@NotNull HttpServletRequest request) {
         final List<Pair<String, String>> bypassTokens = Arrays.asList(
+
+                // Login/Register
                 Pair.of(String.format("%s/users/register",apiPrefix), "POST"),
-                Pair.of(String.format("%s/users/login",apiPrefix), "POST")
+                Pair.of(String.format("%s/users/login",apiPrefix), "POST"),
+
+                Pair.of(String.format("%s/product**",apiPrefix), "GET"),
+                Pair.of(String.format("%s/product/**",apiPrefix), "GET"),
+                Pair.of(String.format("%s/categories/**",apiPrefix), "GET"),
+                Pair.of(String.format("%s/categories",apiPrefix), "GET"),
+
+                // Swagger
+                Pair.of("/api-docs","GET"),
+                Pair.of("/api-docs/**","GET"),
+                Pair.of("/swagger-resource","GET"),
+                Pair.of("/swagger-resource/**","GET"),
+                Pair.of("/configuration/ui","GET"),
+                Pair.of("/configuration/security","GET"),
+                Pair.of("/swagger-ui/**","GET"),
+                Pair.of("/swagger-ui.html","GET"),
+                Pair.of("/swagger-ui/index.html","GET")
         );
+
+        String requestPath = request.getServletPath();
+        String requestMethod = request.getMethod();
+
         for (Pair<String, String> bypassToken : bypassTokens) {
-            if (request.getServletPath().contains(bypassToken.getFirst()) &&
-                    request.getMethod().equals(bypassToken.getSecond())) {
+            String path = bypassToken.getFirst();
+            String method = bypassToken.getSecond();
+            // Check if the request path and method match any pair in the bypassTokens list
+            if (requestPath.matches(path.replace("**", ".*"))
+                    && requestMethod.equalsIgnoreCase(method)) {
                 return true;
             }
         }
