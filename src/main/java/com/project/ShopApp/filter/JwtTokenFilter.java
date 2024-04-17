@@ -42,16 +42,16 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 return;
             }
             final String authHeader = request.getHeader("Authorization");
-            if (authHeader == null || !authHeader.startsWith("Bearer ")){
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Unauthorized");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                 return;
             }
             final String token = authHeader.substring(7);
             final String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
             if (phoneNumber != null &&
-                    SecurityContextHolder.getContext().getAuthentication() == null){
+                    SecurityContextHolder.getContext().getAuthentication() == null) {
                 User userDetails = (User) userDetailsService.loadUserByUsername(phoneNumber);
-                if (jwtTokenUtil.validateToke(token,userDetails)){
+                if (jwtTokenUtil.validateToke(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(
                                     userDetails, null, userDetails.getAuthorities());
@@ -59,9 +59,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
-            filterChain.doFilter(request,response);
-        }catch (Exception e){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Unauthorized");
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
         }
     }
 
@@ -69,24 +69,25 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         final List<Pair<String, String>> bypassTokens = Arrays.asList(
 
                 // Login/Register
-                Pair.of(String.format("%s/users/register",apiPrefix), "POST"),
-                Pair.of(String.format("%s/users/login",apiPrefix), "POST"),
+                Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
+                Pair.of(String.format("%s/users/login", apiPrefix), "POST"),
 
-                Pair.of(String.format("%s/product**",apiPrefix), "GET"),
-                Pair.of(String.format("%s/product/**",apiPrefix), "GET"),
-                Pair.of(String.format("%s/categories/**",apiPrefix), "GET"),
-                Pair.of(String.format("%s/categories",apiPrefix), "GET"),
+                Pair.of(String.format("%s/product**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/product/**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/categories/**", apiPrefix), "GET"),
+                Pair.of(String.format("%s/categories", apiPrefix), "GET"),
+                Pair.of(String.format("%s/orders/**", apiPrefix), "GET"),
 
                 // Swagger
-                Pair.of("/api-docs","GET"),
-                Pair.of("/api-docs/**","GET"),
-                Pair.of("/swagger-resource","GET"),
-                Pair.of("/swagger-resource/**","GET"),
-                Pair.of("/configuration/ui","GET"),
-                Pair.of("/configuration/security","GET"),
-                Pair.of("/swagger-ui/**","GET"),
-                Pair.of("/swagger-ui.html","GET"),
-                Pair.of("/swagger-ui/index.html","GET")
+                Pair.of("/api-docs", "GET"),
+                Pair.of("/api-docs/**", "GET"),
+                Pair.of("/swagger-resource", "GET"),
+                Pair.of("/swagger-resource/**", "GET"),
+                Pair.of("/configuration/ui", "GET"),
+                Pair.of("/configuration/security", "GET"),
+                Pair.of("/swagger-ui/**", "GET"),
+                Pair.of("/swagger-ui.html", "GET"),
+                Pair.of("/swagger-ui/index.html", "GET")
         );
 
         String requestPath = request.getServletPath();

@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +39,7 @@ public class ProductController {
     private final ProductService productService;
     private final ProductImageService productImageService;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("")
     public ResponseEntity<?> createProduct(
             @Valid @RequestBody ProductRequest productRequest,
@@ -67,6 +69,7 @@ public class ProductController {
         return ResponseEntity.ok(new ListProductsResponse(totalPage,products));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{product-id}")
     public ResponseEntity<?> updateProductById(@PathVariable("product-id") Long productId,
                                                                    @Valid @RequestBody ProductRequest productRequest,
@@ -78,13 +81,14 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(productId,productRequest));
     }
 
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{product-id}")
     public ResponseEntity<SuccessResponse> deleteProductById(@PathVariable("product-id") Long productId){
         productService.deleteProduct(productId);
         return ResponseEntity.ok(new SuccessResponse(SuccessResult.DELETE_SUCCESS));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(value = "/uploads-images/{product-id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImages(
             @PathVariable("product-id") Long productId,
@@ -98,6 +102,7 @@ public class ProductController {
         return ResponseEntity.ok(productImageService.getByProductId(productId));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/thumbnail/{product-image-id}")
     public ResponseEntity<SuccessResponse> updateThumbnailProduct(@PathVariable("product-image-id") Long productImageId){
         return ResponseEntity.ok(new SuccessResponse(SuccessResult.UPDATE_SUCCESS,productService.updateThumbnailProduct(productImageId)));

@@ -24,6 +24,8 @@ import java.util.List;
 @RequestMapping("${api.prefix}/categories")
 public class CategoryController {
     private final CategoryService categoryService;
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<?> createCategory(@RequestBody @Valid CategoryRequest categoryRequest, BindingResult result){
 
@@ -43,6 +45,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getCategoryById(categoryId));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("")
     public ResponseEntity<?> updateCategory(@Valid @RequestBody CategoryRequest categoryRequest,
                                                           BindingResult result){
@@ -52,6 +55,7 @@ public class CategoryController {
         return ResponseEntity.ok(new SuccessResponse(SuccessResult.UPDATE_SUCCESS,categoryService.updateCategory(categoryRequest)));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{category-id}")
     public ResponseEntity<SuccessResponse> deleteCategory(@PathVariable("category-id") Long categoryId) {
         categoryService.deleteCategory(categoryId);

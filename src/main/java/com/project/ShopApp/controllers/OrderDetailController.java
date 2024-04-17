@@ -10,6 +10,7 @@ import com.project.ShopApp.services.OrderDetailService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
 @RequestMapping("${api.prefix}/order-details")
 public class OrderDetailController {
     private final OrderDetailService orderDetailService;
+
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("")
     public ResponseEntity<?> createOrderDetail(
             @Valid @RequestBody OrderDetailRequest orderDetailRequest,
@@ -33,17 +36,20 @@ public class OrderDetailController {
                 orderDetailService.createOrderDetail(orderDetailRequest)));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/order/{order-id}")
     public ResponseEntity<List<OrderDetail>> getOrderDetailsByOrderId(@PathVariable("order-id") Long orderId){
         return ResponseEntity.ok(orderDetailService.getOrderDetailsByOrderId(orderId));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     @GetMapping("/{order-detail-id}")
     public ResponseEntity<OrderDetail> getOrderDetail(@PathVariable("order-detail-id") Long orderDetailId){
 
         return ResponseEntity.ok(orderDetailService.getOrderDetail(orderDetailId));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{order-detail-id}")
     public ResponseEntity<?> updateOrderDetail(
             @PathVariable("order-detail-id") Long orderDetailId,
@@ -57,6 +63,7 @@ public class OrderDetailController {
                 orderDetailService.updateOrderDetail(orderDetailId,orderDetailRequestRequest)));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{order-detail-id}")
     public ResponseEntity<SuccessResponse> deleteOrderDetail(@PathVariable("order-detail-id") Long id){
         orderDetailService.deleteOrderDetail(id);

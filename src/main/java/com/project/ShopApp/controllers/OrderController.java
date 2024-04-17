@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
 
-
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("")
     public ResponseEntity<?> createOrder(@RequestBody @Valid OrderRequest orderRequest, BindingResult result){
         if (result.hasErrors()){
@@ -55,6 +56,7 @@ public class OrderController {
         return ResponseEntity.ok(new ListOrderResponse(totalPage,orders));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping("/{order-id}")
     public ResponseEntity<?> updateOrder(@PathVariable("order-id") Long orderId,
                                              @RequestBody @Valid OrderRequest orderRequest,
@@ -65,6 +67,7 @@ public class OrderController {
         return ResponseEntity.ok(new SuccessResponse(SuccessResult.UPDATE_SUCCESS,orderService.updateOrder(orderId,orderRequest)));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping("/{order-id}")
     public ResponseEntity<SuccessResponse> deleteOrder(@PathVariable("order-id") Long orderId){
         orderService.deleteOrder(orderId);

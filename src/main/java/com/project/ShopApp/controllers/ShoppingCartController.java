@@ -8,6 +8,7 @@ import com.project.ShopApp.models.CartItem;
 import com.project.ShopApp.services.ShoppingCartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,12 +18,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ShoppingCartController {
     private final ShoppingCartService shoppingCartService;
+
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping("/{user-id}")
     public ResponseEntity<ShoppingCartResponse>  addCart(@PathVariable("user-id") Long userId,
                                                          @ModelAttribute CartItemRequest cartItemRequest){
         return ResponseEntity.ok(shoppingCartService.addCart(userId,cartItemRequest));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping("/{shopping-cart-id}")
     public ResponseEntity<SuccessResponse> deleteCart(@PathVariable("shopping-cart-id") Long shoppingCartId){
         shoppingCartService.deleteCart(shoppingCartId);
