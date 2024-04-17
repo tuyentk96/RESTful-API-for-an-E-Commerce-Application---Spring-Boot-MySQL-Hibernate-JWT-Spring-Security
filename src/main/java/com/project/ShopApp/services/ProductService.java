@@ -15,7 +15,7 @@ import java.util.List;
 public interface ProductService {
     CreateProductResponse createProduct(ProductRequest productRequest);
     Product getProductById(Long id);
-    Page<Product> getAllProducts(PageRequest pageRequest);
+    Page<Product> getAllProducts(String keyword, Long categoryId, PageRequest pageRequest);
     UpdateProductResponse updateProduct(Long id, ProductRequest productRequest);
     void deleteProduct(Long id);
     boolean existsByName(String name);

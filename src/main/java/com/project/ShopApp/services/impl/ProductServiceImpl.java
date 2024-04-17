@@ -69,9 +69,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<Product> getAllProducts(PageRequest pageRequest) {
-        // lấy danh sách sản phẩm theo page và limit
-        return productRepository.findAll(pageRequest);
+    public Page<Product> getAllProducts(String keyword, Long categoryId, PageRequest pageRequest) {
+        Page<Product> productPage = productRepository.searchProducts(categoryId,keyword,pageRequest);
+        if (!productPage.hasContent()){
+            throw new ErrorResponse(ErrorResult.NOT_FOUND_DATA);
+        }
+        return productPage;
     }
 
     @Override

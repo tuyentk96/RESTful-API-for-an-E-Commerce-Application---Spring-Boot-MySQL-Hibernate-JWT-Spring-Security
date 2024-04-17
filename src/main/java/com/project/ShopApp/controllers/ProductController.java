@@ -1,5 +1,6 @@
 package com.project.ShopApp.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.javafaker.Faker;
 import com.project.ShopApp.dto.request.ProductRequest;
 import com.project.ShopApp.dto.respone.CreateProductResponse;
@@ -13,9 +14,11 @@ import com.project.ShopApp.exception.SuccessResult;
 import com.project.ShopApp.models.Product;
 import com.project.ShopApp.models.ProductImage;
 import com.project.ShopApp.services.ProductImageService;
+import com.project.ShopApp.services.ProductRedisService;
 import com.project.ShopApp.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -35,9 +38,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("${api.prefix}/product")
 @RequiredArgsConstructor
+@Slf4j
 public class ProductController {
     private final ProductService productService;
     private final ProductImageService productImageService;
+    private final ProductRedisService productRedisService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("")
@@ -57,15 +62,28 @@ public class ProductController {
 
     @GetMapping("")
     public ResponseEntity<ListProductsResponse> getProducts(
-        @RequestParam("page") int page,
-        @RequestParam("limit") int limit
-    ){
+        @RequestParam(defaultValue = "0", name = "page") int page,
+        @RequestParam(defaultValue = "10", name = "limit") int limit,
+        @RequestParam(defaultValue = "0", name = "category_id") Long categoryId,
+        @RequestParam(defaultValue = "") String keyword
+    ) throws JsonProcessingException {
+        int totalPage = 0;
         PageRequest pageRequest = PageRequest.of(
                 page, limit,
                 Sort.by("createdAt").descending());
-        Page<Product> productPage = productService.getAllProducts(pageRequest);
-        List<Product> products = productPage.getContent();
-        int totalPage = productPage.getTotalPages();
+
+        log.info(String.format("keyword = %s , category_id = %d , page = %d , limit = %d",
+                keyword, categoryId, page, limit));
+
+        List<Product> products = productRedisService.getAllProducts(keyword,categoryId,pageRequest);
+
+        if (products == null || products.isEmpty()){
+            Page<Product> productPage = productService.getAllProducts(keyword,categoryId,pageRequest);
+            products = productPage.getContent();
+            totalPage = productPage.getTotalPages();
+            productRedisService.saveAllProducts(products,keyword,categoryId,pageRequest);
+        }
+
         return ResponseEntity.ok(new ListProductsResponse(totalPage,products));
     }
 
