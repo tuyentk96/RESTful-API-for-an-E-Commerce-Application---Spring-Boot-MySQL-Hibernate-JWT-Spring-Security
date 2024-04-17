@@ -52,7 +52,9 @@ public class ProductController {
         if (result.hasErrors()){
             return ValidatedErrorResponse.validatedErrorResponse(result);
         }
-        return ResponseEntity.ok(productService.createProduct(productRequest));
+        CreateProductResponse createProductResponse = productService.createProduct(productRequest);
+        productRedisService.clear();
+        return ResponseEntity.ok(createProductResponse);
     }
 
     @GetMapping("/{product-id}")
@@ -95,14 +97,16 @@ public class ProductController {
         if (result.hasErrors()){
             return ValidatedErrorResponse.validatedErrorResponse(result);
         }
-
-        return ResponseEntity.ok(productService.updateProduct(productId,productRequest));
+        UpdateProductResponse updateProductResponse = productService.updateProduct(productId,productRequest);
+        productRedisService.clear();
+        return ResponseEntity.ok(updateProductResponse);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{product-id}")
     public ResponseEntity<SuccessResponse> deleteProductById(@PathVariable("product-id") Long productId){
         productService.deleteProduct(productId);
+        productRedisService.clear();
         return ResponseEntity.ok(new SuccessResponse(SuccessResult.DELETE_SUCCESS));
     }
 
